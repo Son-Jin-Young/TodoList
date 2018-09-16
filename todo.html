@@ -1,0 +1,31 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>TODO를 MVC로 해보자</title>
+    <script type="module" src="./todo.js"></script>
+    <link rel="stylesheet" href="todo.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="countInfoWrap">
+            <div class="todo-count">10</div>
+            <div class="done-count">10</div>
+        </div>
+        <section class="todoBox section-basic-style">
+            할일입력 :
+            <input type="text" name="todo">
+            <button>등록</button>
+        </section>
+        <section class="logBox section-basic-style">
+            <button class="fold">접기</button>
+            <div>해야할 일들</div>
+            <ul class="todolist visible">
+                <li id="1233"> 공부하기 <span class="deleteX"> X </span></li>
+            </ul>
+        </section>
+    </div>
+</body>
+
+</html>
