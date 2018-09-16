@@ -38,9 +38,10 @@ class TodoController {
         this.inputView    = inputView;
         this.listView     = listView;
         this.foldButton = foldButton;
-        
+
         this.initService();
     }
+
     initService() {
         this.inputView.addTodoHandler = this.addTodoHandler.bind(this);
         this.foldButton.addFoldHandler = this.addFoldHandler.bind(this);
@@ -64,6 +65,17 @@ class TodoController {
 
     afterToggleFold(isFold) {
         this.renderFoldButton(isFold);
+    }
+
+    getInitData(initUrl) {
+        fetch(initUrl)
+        .then(res => res.json())
+        .then(data =>{
+            for (let i = 0; i < data.length; i++) {
+                this.todoModel.addTodo.call(this.todoModel, data[i], this.afterAddTodo.bind(this));
+            }
+            // this.listView.render(data);
+        });
     }
 
     renderInputView() {
@@ -163,14 +175,4 @@ class ListFoldButtonView {
 
 }
 
-// Model
-const todoModel = new TodoModel();
-const foldModel = new FoldModel();
-
-// View
-const inputView = new InputView();
-const listView = new ListView();
-const foldButton = new ListFoldButtonView();
-
-// Control
-const todoController = new TodoController(todoModel, foldModel, inputView, listView, foldButton);
+export {TodoModel, ListView, TodoController, FoldModel, InputView, ListFoldButtonView};
