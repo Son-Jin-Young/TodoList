@@ -9,8 +9,8 @@ class TodoModel extends EventChannel/* Observable */ {
     }
 
     addTodo(todo) {
-        this.todos = [...this.todos, todo];
-        // this.notify(this.todos);
+        
+        this.todos = [...this.todos, {"title": todo, "id": this.todos.length, "status": "todo"}];
         this.publish('CHANGE_TODO_LIST', this.todos);
     }
 
@@ -44,6 +44,40 @@ class FoldModel extends EventChannel/* Observable */ {
 
     get fold() {
         return this.isFold;
+    }
+}
+
+class CountModel extends EventChannel {
+    constructor(actionDispatcher, todoModel) {
+        super();
+        this.todoElement = document.querySelector('.todo-count');
+        this.doneElement = document.querySelector('.done-count');
+
+        this.actionDispatcher = actionDispatcher;
+        this.todoModel = todoModel;
+
+        this.todoCount = 0;
+        this.doneCount = 0;   
+
+        this.subscribe();
+    }
+
+    subscribe() {
+        this.todoModel.subscribe('CHANGE_TODO_LIST', (todoList) => {
+            this.render(todoList);
+        });
+
+        this.todoModel.subscribe('FETCH_INIT_DATA', (todoList) => {
+            this.render(todoList);
+        });
+    }
+
+    render(todoList) {
+        this.todoCount = todoList.filter((todo) => todo.status === 'todo').length;
+        this.doneCount = todoList.filter((todo) => todo.status === 'done').length;
+
+        this.todoElement.innerHTML = this.todoCount;
+        this.doneElement.innerHTML = this.doneCount;
     }
 }
 
@@ -114,8 +148,8 @@ class ListView {
 
     render(todoList) {
         let listHTML = todoList.reduce((html, todo) => {
-            return `${html} <li> ${todo} <span class="deleteX"> X </span> </li> `;
-        }, "")
+            return `${html} <li id="${todo.id}"> ${todo.title} <span class="deleteX"> X </span> </li> `;
+        }, "");
 
         this.todoList = todoList;
         this.listElement.innerHTML = listHTML;
@@ -165,4 +199,4 @@ class ListFoldButtonView {
 
 }
 
-export {TodoModel, ListView, FoldModel, InputView, ListFoldButtonView};
+export {TodoModel, ListView, FoldModel, InputView, ListFoldButtonView, CountModel};

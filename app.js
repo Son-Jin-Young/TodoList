@@ -1,4 +1,4 @@
-import {TodoModel, ListView, ListFoldButtonView, InputView, FoldModel} from './todo.js';
+import {TodoModel, ListView, ListFoldButtonView, InputView, FoldModel, CountModel} from './todo.js';
 import { ActionDispatcher } from './common.js';
 
 const initialDataUrl = 'http://localhost:3002/data/initData.json';
@@ -11,6 +11,7 @@ const actionDispatcher = new ActionDispatcher({todoModel, foldModel});
 
 // View
 new InputView(actionDispatcher, todoModel);
+new CountModel(actionDispatcher, todoModel);
 new ListView(actionDispatcher, todoModel, foldModel);
 new ListFoldButtonView(actionDispatcher, foldModel);
 

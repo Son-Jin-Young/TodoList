@@ -1,3 +1,5 @@
 [
-    "공부하기", "책정리", "이직준비"
+    {"title": "공부하기", "id": 1, "status": "todo"}, 
+    {"title": "책정리" , "id": 2, "status": "todo"}, 
+    {"title": "이직준비", "id": 3, "status": "todo"}
 ]
