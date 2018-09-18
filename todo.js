@@ -1,12 +1,15 @@
-class TodoModel {
+import Observable from './common.js';
+
+class TodoModel extends Observable {
     //Controller, View의 존재를 전혀 모르게 구현.
     constructor() {
+        super();
         this.todos = [];
     }
 
-    addTodo(todo, fnAfter) {
+    addTodo(todo) {
         this.todos = [...this.todos, todo];
-        fnAfter(this.todos);
+        this.notify(this.todos);
     }
 
     get todoList () {
@@ -14,14 +17,15 @@ class TodoModel {
     }
 }
 
-class FoldModel {
+class FoldModel extends Observable {
     constructor() {
+        super();
         this.isFold = false;
     }
 
-    toggleFold(callback) {
+    toggleFold() {
         this.isFold = !this.isFold;
-        callback(this.isFold);
+        this.notify(this.isFold);
     }
 
     get fold() {
@@ -30,73 +34,64 @@ class FoldModel {
 }
 
 
-class TodoController {
-    constructor(todoModel, foldModel, inputView, listView, foldButton) {
-        this.todoModel    = todoModel;
-        this.foldModel = foldModel;
+// class TodoController {
+//     constructor(todoModel, foldModel, inputView, listView, foldButton) {
+//         this.todoModel    = todoModel;
+//         this.foldModel = foldModel;
 
-        this.inputView    = inputView;
-        this.listView     = listView;
-        this.foldButton = foldButton;
+//         this.inputView    = inputView;
+//         this.listView     = listView;
+//         this.foldButton = foldButton;
 
-        this.initService();
-    }
+//         this.initService();
+//     }
 
-    initService() {
-        this.inputView.addTodoHandler = this.addTodoHandler.bind(this);
-        this.foldButton.addFoldHandler = this.addFoldHandler.bind(this);
-    }
+//     initService() {
+//         this.inputView.addTodoHandler = this.addTodoHandler.bind(this);
+//         this.foldButton.addFoldHandler = this.addFoldHandler.bind(this);
+//     }
 
-    // View의 이벤트를 연결 시킬 메서드
-    addTodoHandler(todoString) {
-        if(!todoString) return;
-        this.todoModel.addTodo.call(this.todoModel, todoString, this.afterAddTodo.bind(this));
-    }
+//     // View의 이벤트를 연결 시킬 메서드
+//     addTodoHandler(todoString) {
+//         if(!todoString) return;
+//         this.todoModel.addTodo.call(this.todoModel, todoString, this.afterAddTodo.bind(this));
+//     }
 
-    // View의 이벤트의 후처리 이벤트
-    afterAddTodo(todoArray) {
-        this.renderInputView(todoArray);
-        this.renderListView(todoArray);
-    }
+//     // View의 이벤트의 후처리 이벤트
+//     afterAddTodo(todoArray) {
+//         this.renderInputView(todoArray);
+//         this.renderListView(todoArray);
+//     }
 
-    addFoldHandler() {
-        this.foldModel.toggleFold.call(this.foldModel, this.afterToggleFold.bind(this));
-    }
+//     addFoldHandler() {
+//         this.foldModel.toggleFold.call(this.foldModel, this.afterToggleFold.bind(this));
+//     }
 
-    afterToggleFold(isFold) {
-        this.renderFoldButton(isFold);
-    }
+//     afterToggleFold(isFold) {
+//         this.renderFoldButton(isFold);
+//     }
 
-    getInitData(initUrl) {
-        fetch(initUrl)
-        .then(res => res.json())
-        .then(data =>{
-            for (let i = 0; i < data.length; i++) {
-                this.todoModel.addTodo.call(this.todoModel, data[i], this.afterAddTodo.bind(this));
-            }
-        });
-    }
+//     renderInputView() {
+//         this.inputView.render();
+//     }
 
-    renderInputView() {
-        this.inputView.render();
-    }
+//     renderListView(todoArray) {
+//         this.listView.render(todoArray);
+//     }
 
-    renderListView(todoArray) {
-        this.listView.render(todoArray);
-    }
-
-    renderFoldButton(isFold) {
-        this.foldButton.render(isFold);
-        this.listView.toggle(isFold);
-    }
-}
+//     renderFoldButton(isFold) {
+//         this.foldButton.render(isFold);
+//         this.listView.toggle(isFold);
+//     }
+// }
 
 //view들은 model이 어떤 것인지 전혀 모른다.
 class InputView {
-    constructor() {
+    constructor(todoModel) {
         this.regButton = document.querySelector("button");
         this.inputElement = document.querySelector("input[name=todo]")
-        this.addTodoHandler = null;
+        // this.addTodoHandler = addTodoHandler;
+        this.todoModel = todoModel;
         this.initEvents();
     }
 
@@ -113,6 +108,11 @@ class InputView {
         });
     }
 
+    addTodoHandler(todoString) {
+        this.todoModel.addTodo.call(this.todoModel, todoString);
+        this.render();
+    }
+
     getTodoValue() { 
         return document.querySelector("input[name=todo]").value;
     }
@@ -123,12 +123,24 @@ class InputView {
 }
 
 class ListView {
-    constructor() {
+    constructor(todoModel, todoModelListFold) {
         this.listElement = document.querySelector(".todolist");
+        this.todoModel = todoModel;
+        this.todoModelListFold = todoModelListFold;
+
         this._ = {
             displayClassName : "visible"
         }
+
         this.todoList = null;
+        this.subscribe();
+    }
+
+    subscribe() {
+        this.todoModel.subscribe((todoList) => {
+            this.todoList = todoList;
+            this.render(todoList);
+        });
     }
 
     render(todoList) {
@@ -150,17 +162,25 @@ class ListView {
 }
 
 class ListFoldButtonView {
-    constructor() {
+    constructor(foldModel) {
         // 컨트롤할 View
         this.foldButton = document.querySelector('.fold');
         // view의 이벤트
         this.addFoldHandler = null;
+        this.foldModel = foldModel;
         this.initEvents();
+        this.subscribe();
+    }
+
+    subscribe() {
+        this.foldModel.subscribe((isFold) => {
+            this.render(isFold);
+        }); 
     }
 
     initEvents() {
         this.foldButton.addEventListener('click', (e) => {
-            this.addFoldHandler();
+            this.foldModel.toggleFold.call(this.foldModel);
         });
     }
  
@@ -174,4 +194,4 @@ class ListFoldButtonView {
 
 }
 
-export {TodoModel, ListView, TodoController, FoldModel, InputView, ListFoldButtonView};
+export {TodoModel, ListView, FoldModel, InputView, ListFoldButtonView};
