@@ -1,6 +1,6 @@
 import {TodoModel, ListView, TodoController, ListFoldButtonView, InputView, FoldModel} from './todo.js';
 
-const initialDataUrl = 'http://localhost:5500/data/initData.json';
+const initialDataUrl = 'http://localhost:3000/data/initData.json';
 // Model
 const todoModel = new TodoModel();
 const foldModel = new FoldModel();

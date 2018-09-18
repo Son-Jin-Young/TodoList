@@ -74,7 +74,6 @@ class TodoController {
             for (let i = 0; i < data.length; i++) {
                 this.todoModel.addTodo.call(this.todoModel, data[i], this.afterAddTodo.bind(this));
             }
-            // this.listView.render(data);
         });
     }
 
