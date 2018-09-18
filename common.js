@@ -37,4 +37,29 @@ class EventChannel {
     }
 }
 
-export {Observable, EventChannel};
+class ActionDispatcher {
+    constructor({todoModel, foldModel}) {
+        this.todoModel = todoModel;
+        this.foldModel = foldModel;
+    }
+
+    dispatch(eventType, data) {
+        console.log('dispatch event type : ', eventType);
+        switch(eventType) {
+            case 'ADD_BUTTON':
+                this.todoModel.addTodo(data);
+                break;
+            case 'CHANGE_TODO_LIST':
+                this.todoModel.addTodo(data);
+                break;
+            case 'FETCH_INIT_DATA':
+                this.todoModel.getInitialData();
+                break;
+            case 'CLICK_TOGGLE_BTN':
+                this.foldModel.toggleFold();
+                break;
+        }
+    }
+}
+
+export {Observable, EventChannel, ActionDispatcher};
