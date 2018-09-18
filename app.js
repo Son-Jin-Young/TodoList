@@ -6,9 +6,6 @@ const todoModel = new TodoModel();
 const foldModel = new FoldModel();
 
 // View
-const inputView = new InputView(todoModel);
-const listView = new ListView(todoModel, foldModel);
-const foldButton = new ListFoldButtonView(foldModel);
-
-// Control
-// const todoController = new TodoController(todoModel, foldModel, inputView, listView, foldButton);
+new InputView(todoModel);
+new ListView(todoModel, foldModel);
+new ListFoldButtonView(foldModel);

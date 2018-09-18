@@ -1,6 +1,6 @@
-import Observable from './common.js';
+import {Observable, EventChannel} from './common.js';
 
-class TodoModel extends Observable {
+class TodoModel extends EventChannel/* Observable */ {
     //Controller, View의 존재를 전혀 모르게 구현.
     constructor() {
         super();
@@ -9,7 +9,8 @@ class TodoModel extends Observable {
 
     addTodo(todo) {
         this.todos = [...this.todos, todo];
-        this.notify(this.todos);
+        // this.notify(this.todos);
+        this.publish('LISTING_TODOS', this.todos);
     }
 
     get todoList () {
@@ -17,7 +18,7 @@ class TodoModel extends Observable {
     }
 }
 
-class FoldModel extends Observable {
+class FoldModel extends EventChannel/* Observable */ {
     constructor() {
         super();
         this.isFold = false;
@@ -25,65 +26,14 @@ class FoldModel extends Observable {
 
     toggleFold() {
         this.isFold = !this.isFold;
-        this.notify(this.isFold);
+        // this.notify(this.isFold);
+        this.publish('CHANGE_FOLD', this.isFold);
     }
 
     get fold() {
         return this.isFold;
     }
 }
-
-
-// class TodoController {
-//     constructor(todoModel, foldModel, inputView, listView, foldButton) {
-//         this.todoModel    = todoModel;
-//         this.foldModel = foldModel;
-
-//         this.inputView    = inputView;
-//         this.listView     = listView;
-//         this.foldButton = foldButton;
-
-//         this.initService();
-//     }
-
-//     initService() {
-//         this.inputView.addTodoHandler = this.addTodoHandler.bind(this);
-//         this.foldButton.addFoldHandler = this.addFoldHandler.bind(this);
-//     }
-
-//     // View의 이벤트를 연결 시킬 메서드
-//     addTodoHandler(todoString) {
-//         if(!todoString) return;
-//         this.todoModel.addTodo.call(this.todoModel, todoString, this.afterAddTodo.bind(this));
-//     }
-
-//     // View의 이벤트의 후처리 이벤트
-//     afterAddTodo(todoArray) {
-//         this.renderInputView(todoArray);
-//         this.renderListView(todoArray);
-//     }
-
-//     addFoldHandler() {
-//         this.foldModel.toggleFold.call(this.foldModel, this.afterToggleFold.bind(this));
-//     }
-
-//     afterToggleFold(isFold) {
-//         this.renderFoldButton(isFold);
-//     }
-
-//     renderInputView() {
-//         this.inputView.render();
-//     }
-
-//     renderListView(todoArray) {
-//         this.listView.render(todoArray);
-//     }
-
-//     renderFoldButton(isFold) {
-//         this.foldButton.render(isFold);
-//         this.listView.toggle(isFold);
-//     }
-// }
 
 //view들은 model이 어떤 것인지 전혀 모른다.
 class InputView {
@@ -123,10 +73,10 @@ class InputView {
 }
 
 class ListView {
-    constructor(todoModel, todoModelListFold) {
+    constructor(todoModel, foldModel) {
         this.listElement = document.querySelector(".todolist");
         this.todoModel = todoModel;
-        this.todoModelListFold = todoModelListFold;
+        this.foldModel = foldModel;
 
         this._ = {
             displayClassName : "visible"
@@ -137,9 +87,13 @@ class ListView {
     }
 
     subscribe() {
-        this.todoModel.subscribe((todoList) => {
+        this.todoModel.subscribe('LISTING_TODOS', (todoList) => {
             this.todoList = todoList;
             this.render(todoList);
+        });
+
+        this.foldModel.subscribe('CHANGE_FOLD', (isFold) => {
+            this.toggle(isFold);
         });
     }
 
@@ -173,7 +127,7 @@ class ListFoldButtonView {
     }
 
     subscribe() {
-        this.foldModel.subscribe((isFold) => {
+        this.foldModel.subscribe('CHANGE_FOLD', (isFold) => {
             this.render(isFold);
         }); 
     }
