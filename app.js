@@ -1,7 +1,9 @@
-import {TodoModel, ListView, ListFoldButtonView, InputView, FoldModel, CountModel} from './todo.js';
-import { ActionDispatcher } from './common.js';
+import {TodoModel, FoldModel, CountModel} from './model/index.js';
+import {ListView, ListFoldButtonView, InputView} from './component/index.js';
+import { ActionDispatcher } from './common/index.js';
+import {ActionEvent} from './constant/ActionEvent.js';
 
-const initialDataUrl = 'http://localhost:3002/data/initData.json';
+const initialDataUrl = `http://${location.host}/data/initData.json`;
 // Model
 const todoModel = new TodoModel(initialDataUrl);
 const foldModel = new FoldModel();
@@ -16,5 +18,5 @@ new ListView(actionDispatcher, todoModel, foldModel);
 new ListFoldButtonView(actionDispatcher, foldModel);
 
 document.addEventListener('DOMContentLoaded', () => {
-    actionDispatcher.dispatch('FETCH_INIT_DATA');
+    actionDispatcher.dispatch(ActionEvent.INIT);
 });

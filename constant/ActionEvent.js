@@ -1,0 +1,7 @@
+export const ActionEvent = {
+    ADD: 'ADD_BUTTON',
+    CHANGE_STATUS: 'DONE_BUTTON',
+    REFRESH_LIST: 'CHANGE_TODO_LIST',
+    INIT: 'FETCH_INIT_DATA',
+    TOGGLE_LIST: 'CLICK_TOGGLE_BTN'
+};
